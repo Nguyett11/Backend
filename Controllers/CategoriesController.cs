@@ -21,11 +21,26 @@ namespace WebProject.Controllers
             _context = context;
         }
 
+        //// GET: api/Categories
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Categories>>> GetCategories()
+        //{
+        //    return await _context.Categories.ToListAsync();
+        //}
+
         // GET: api/Categories
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Categories>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            var categories = await _context.Categories.ToListAsync();
+
+            // Kiểm tra nếu không có danh mục trong cơ sở dữ liệu
+            if (categories == null || categories.Count == 0)
+            {
+                return NotFound(); // Trả về NotFound nếu không có dữ liệu
+            }
+
+            return Ok(categories); // Trả về Ok nếu có dữ liệu
         }
 
         // GET: api/Categories/5
@@ -39,7 +54,7 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return categories;
+            return Ok(categories);
         }
 
         // PUT: api/Categories/5
@@ -51,6 +66,7 @@ namespace WebProject.Controllers
             {
                 return BadRequest();
             }
+
 
             _context.Entry(categories).State = EntityState.Modified;
 
@@ -78,6 +94,7 @@ namespace WebProject.Controllers
         [HttpPost]
         public async Task<ActionResult<Categories>> PostCategories(Categories categories)
         {
+
             _context.Categories.Add(categories);
             await _context.SaveChangesAsync();
 

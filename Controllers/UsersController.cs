@@ -22,11 +22,11 @@ namespace WebProject.Controllers
         }
 
         // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
-        {
-            return await _context.Users.ToListAsync();
-        }
+        //[HttpGet]
+        //public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
+        //{
+        //    return await _context.Users.ToListAsync();
+        //}
 
         // GET: api/Users/5
         [HttpGet("{id}")]
@@ -41,6 +41,21 @@ namespace WebProject.Controllers
 
             return userid;
         }
+
+        // GET: api/Users/role/2
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Users>>> GetUsersWithRole2()
+        {
+            var users = await _context.Users.Where(u => u.role_id == 2).ToListAsync();
+
+            if (users == null || users.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return users;
+        }
+
 
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

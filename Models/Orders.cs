@@ -20,5 +20,6 @@ namespace WebProject.Models
         [Required]
         [Column(TypeName = "decimal(15,2)")]
         public decimal total_amount { get; set; }
+
     }
 }
