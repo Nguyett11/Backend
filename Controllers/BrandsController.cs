@@ -25,7 +25,15 @@ namespace WebProject.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Brands>>> GetBrands()
         {
-            return await _context.Brands.ToListAsync();
+            var brands = await _context.Brands.ToListAsync();
+
+            // Kiểm tra nếu không có thương hiệu trong cơ sở dữ liệu
+            if (brands == null || brands.Count == 0)
+            {
+                return NotFound(); // Trả về NotFound nếu không có dữ liệu
+            }
+
+            return Ok(brands); // Trả về Ok nếu có dữ liệu
         }
 
         // GET: api/Brands/5
@@ -39,7 +47,7 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return brands;
+            return Ok(brands); 
         }
 
         // GET: api/Brands/ByCategory/5
@@ -48,12 +56,12 @@ namespace WebProject.Controllers
         {
             var brands = await _context.Brands.Where(b => b.category_id == id_danhmuc).ToListAsync();
 
-            if (brands == null || !brands.Any())
+            if (!brands.Any())
             {
                 return NotFound();
             }
 
-            return brands;
+            return Ok(brands); 
         }
 
         // PUT: api/Brands/5
@@ -92,6 +100,11 @@ namespace WebProject.Controllers
         [HttpPost]
         public async Task<ActionResult<Brands>> PostBrands(Brands brands)
         {
+            var categoryExists = await _context.Categories.AnyAsync(c => c.category_id == brands.category_id);
+            if (!categoryExists)
+            {
+                return BadRequest(new { message = "category_id không hợp lệ. Category không tồn tại." });
+            }
             _context.Brands.Add(brands);
             await _context.SaveChangesAsync();
 

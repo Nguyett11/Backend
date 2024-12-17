@@ -21,7 +21,15 @@ namespace WebProject.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Orders>>> GetOrders()
         {
-            return await _context.Orders.ToListAsync();
+            var orders = await _context.Orders.ToListAsync();
+
+            // Kiểm tra nếu không có đơn hàng trong cơ sở dữ liệu
+            if (orders == null || orders.Count == 0)
+            {
+                return NotFound(); // Trả về NotFound nếu không có dữ liệu
+            }
+
+            return Ok(orders); // Trả về Ok nếu có dữ liệu
         }
 
         // GET: api/Orders/5
@@ -35,7 +43,7 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return orders;
+            return Ok(orders);
         }
 
         // PUT: api/Orders/5
@@ -74,6 +82,10 @@ namespace WebProject.Controllers
         [HttpPost]
         public async Task<ActionResult<Orders>> PostOrders(Orders orders)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);  // Return BadRequest if model validation fails
+            }
             _context.Orders.Add(orders);
             try
             {
@@ -97,20 +109,20 @@ namespace WebProject.Controllers
 
 
         // DELETE: api/Orders/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrders(string id)
-        {
-            var orders = await _context.Orders.FindAsync(id);
-            if (orders == null)
-            {
-                return NotFound();
-            }
+        //[HttpDelete("{id}")]
+        //public async Task<IActionResult> DeleteOrders(int id)
+        //{
+        //    var orders = await _context.Orders.FindAsync(id);
+        //    if (orders == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            _context.Orders.Remove(orders);
-            await _context.SaveChangesAsync();
+        //    _context.Orders.Remove(orders);
+        //    await _context.SaveChangesAsync();
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
 
         [HttpDelete("deleteorders/{orderId}")]
         public async Task<IActionResult> DeleteOrderWithDetails(int orderId)
@@ -174,12 +186,75 @@ namespace WebProject.Controllers
             return Ok(order); // Trả về đối tượng đơn hàng
         }
 
+        //Get: tìm kiếm
+        [HttpGet("search/{searchText}")]
+        public async Task<ActionResult<IEnumerable<Orders>>> GetTimKiem(string searchText)
+        {
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                return BadRequest("Văn bản tìm kiếm không được để trống.");
+            }
 
+            try
+            {
+                var orders = await _context.Orders
+                    .Where(v => EF.Functions.Like(v.order_id.ToString(), $"%{searchText}%"))
+                    .ToListAsync();
+
+                if (orders == null || !orders.Any())
+                {
+                    return NotFound();
+                }
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, "Lỗi máy chủ nội bộ");
+            }
+        }
+
+        public class OrderStatusUpdate
+        {
+            public string OrderStatus { get; set; }
+        }
+
+        // PATCH: api/Orders/5
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchOrderStatus(int id, [FromBody] OrderStatusUpdate orderStatusUpdate)
+        {
+            if (orderStatusUpdate == null || string.IsNullOrEmpty(orderStatusUpdate.OrderStatus))
+            {
+                return BadRequest("Order status cannot be empty.");
+            }
+
+            // Find the order by ID
+            var order = await _context.Orders.FindAsync(id);
+
+            if (order == null)
+            {
+                return NotFound(); // If order not found, return 404
+            }
+
+            // Update only the order_status field
+            order.order_status = orderStatusUpdate.OrderStatus;
+
+            // Mark the entity as modified
+            _context.Entry(order).State = EntityState.Modified;
+
+            // Save changes to the database
+            await _context.SaveChangesAsync();
+
+            return NoContent(); // Return 204 No Content after successful update
+        }
 
         private bool OrdersExists(int id)
         {
             return _context.Orders.Any(e => e.order_id == id);
         }
+
+
     }
 }
 
