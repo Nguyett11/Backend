@@ -21,12 +21,23 @@ namespace WebProject.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Order_Details>>> GetOrder_Details()
         {
-            return await _context.Order_Details.ToListAsync();
+            var orderDetails = await _context.Order_Details.ToListAsync();
+
+            // Kiểm tra nếu không có dữ liệu trong Order_Details
+            if (orderDetails == null || orderDetails.Count == 0)
+            {
+                return NotFound(); // Trả về NotFound nếu không có dữ liệu
+            }
+
+            return Ok(orderDetails); // Trả về Ok nếu có dữ liệu
         }
 
+
+
         // GET: api/Order_Details/5
+
         [HttpGet("{id}")]
-        public async Task<ActionResult<Order_Details>> GetOrder_Details(int id)
+        public async Task<ActionResult<Order_Details>> GetOrderDetailsById(int id)
         {
             var order_Details = await _context.Order_Details.FindAsync(id);
 
@@ -35,28 +46,12 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return order_Details;
+            return Ok(order_Details);
         }
 
         // GET: api/Order_Details/order_id/{orderId}
-        //[HttpGet("order_id/{orderId}")]
-        //public async Task<ActionResult<IEnumerable<Order_Details>>> GetOrderDetailsByOrderId(int orderId)
-        //{
-        //    // Tìm tất cả Order_Details với order_id tương ứng
-        //    var orderDetails = await _context.Order_Details
-        //                                      .Where(od => od.order_id == orderId)
-        //                                      .ToListAsync();
-
-        //    if (orderDetails == null || orderDetails.Count == 0)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return orderDetails;
-        //}
-        // GET: api/Order_Details/order_id/{orderId}
         [HttpGet("order_id/{orderId}")]
-        public async Task<ActionResult<object>> GetOrderDetailsByOrderId(int orderId)
+        public async Task<ActionResult<IEnumerable<Order_Details>>> GetOrderDetailsByOrderId(int orderId)
         {
             // Lấy danh sách các bản ghi chi tiết đơn hàng
             var orderDetails = await _context.Order_Details
