@@ -344,3 +344,4 @@ D:\FrE-BE\Webshop\backend_webshop\WebProject\WebProject.Tests\obj\Debug\net8.0\r
 D:\FrE-BE\Webshop\backend_webshop\WebProject\WebProject.Tests\obj\Debug\net8.0\WebProject.Tests.pdb
 D:\FrE-BE\Webshop\backend_webshop\WebProject\WebProject.Tests\obj\Debug\net8.0\WebProject.Tests.genruntimeconfig.cache
 D:\FrE-BE\Webshop\backend_webshop\WebProject\WebProject.Tests\obj\Debug\net8.0\ref\WebProject.Tests.dll
+D:\FrE-BE\Webshop\backend_webshop\WebProject\WebProject.Tests\obj\Debug\net8.0\WebProject.Tests.sourcelink.json
