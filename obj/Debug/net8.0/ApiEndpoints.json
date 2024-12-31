@@ -791,6 +791,16 @@
   },
   {
     "ContainingType": "WebProject.Controllers.ProductsController",
+    "Method": "SaveFile",
+    "RelativePath": "api/Products/SaveFile",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebProject.Controllers.ProductsController",
     "Method": "GetTimKiem",
     "RelativePath": "api/Products/search/{searchText}",
     "HttpMethod": "GET",
@@ -1140,22 +1150,6 @@
   },
   {
     "ContainingType": "WebProject.Controllers.UsersController",
-    "Method": "DeleteUsers",
-    "RelativePath": "api/Users/{id}",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "WebProject.Controllers.UsersController",
     "Method": "UpdatePassword",
     "RelativePath": "api/Users/{id}/password",
     "HttpMethod": "PATCH",
@@ -1170,6 +1164,22 @@
       {
         "Name": "request",
         "Type": "WebProject.Controllers.UsersController\u002BUpdatePasswordRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "WebProject.Controllers.UsersController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/Users/deleteUser/{userId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
         "IsRequired": true
       }
     ],

@@ -39,7 +39,7 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return userid;
+            return Ok(userid);
         }
 
         // GET: api/Users/role/2
@@ -53,7 +53,7 @@ namespace WebProject.Controllers
                 return NotFound();
             }
 
-            return users;
+            return Ok(users);
         }
 
 
@@ -93,34 +93,56 @@ namespace WebProject.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> PostUsers(Users users)
         {
-            // Gán giá trị mặc định cho role_id nếu không được cung cấp
-            if (users.role_id == 0)  // Nếu role_id chưa được gán (mặc định là 0)
+            // Kiểm tra nếu role_id không được cung cấp hoặc được gán bằng 0
+            if (users.role_id == 0)
             {
                 users.role_id = 2;  // Gán role_id mặc định là 2
             }
 
-            _context.Users.Add(users);
-            await _context.SaveChangesAsync();
+            _context.Users.Add(users); // Thêm người dùng vào cơ sở dữ liệu
+            await _context.SaveChangesAsync(); // Lưu thay đổi vào cơ sở dữ liệu
 
-            return CreatedAtAction("GetUsers", new { id = users.user_id }, users);
+            // Trả về kết quả với mã trạng thái 201 và đường dẫn đến người dùng vừa tạo
+            return CreatedAtAction("GetUserId", new { id = users.user_id }, users);
         }
+
 
 
         // DELETE: api/Users/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUsers(int id)
+        [HttpDelete("deleteUser/{userId}")]
+        public async Task<IActionResult> DeleteUser(int userId)
         {
-            var users = await _context.Users.FindAsync(id);
-            if (users == null)
+            // Tìm người dùng theo userId
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
             {
-                return NotFound();
+                return NotFound(); // Trả về 404 nếu không tìm thấy người dùng
             }
 
-            _context.Users.Remove(users);
+            // Tìm tất cả các đơn hàng của người dùng này và thực thi truy vấn
+            var ordersList = await _context.Orders.Where(o => o.customer_id == userId).ToListAsync();
+
+            // Xóa tất cả các chi tiết đơn hàng liên quan đến các đơn hàng của người dùng
+            foreach (var order in ordersList)
+            {
+                var orderDetails = _context.Order_Details.Where(od => od.order_id == order.order_id);
+                _context.Order_Details.RemoveRange(orderDetails); // Xóa chi tiết đơn hàng
+            }
+
+            // Xóa các đơn hàng của người dùng
+            _context.Orders.RemoveRange(ordersList);
+
+            // Xóa người dùng
+            _context.Users.Remove(user);
+
+            // Lưu các thay đổi vào cơ sở dữ liệu
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return NoContent(); // Trả về 204 No Content khi xóa thành công
         }
+
+
+
 
         // Đăng nhập
         [HttpPost("login")]
@@ -155,6 +177,7 @@ namespace WebProject.Controllers
             {
                 return BadRequest(new { success = false, message = "Lỗi: role_id không hợp lệ" });
             }
+
         }
 
 
