@@ -184,6 +184,30 @@ namespace WebProject.Controllers
         }
 
 
+        //Post Ảnh
+        [Route("SaveFile")]
+        [HttpPost]
+        public JsonResult SaveFile()
+        {
+            try
+            {
+                var httpRequest = Request.Form;
+                var postedFile = httpRequest.Files[0];
+                string fileName = postedFile.FileName;
+                var physicalPath = _env.ContentRootPath + "/Photos/" + fileName;
+
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+                return new JsonResult(fileName);
+            }
+            catch (Exception)
+            {
+                return new JsonResult("com.jpg");
+            }
+        }
+
         //Lọc theo giá
         // GET: api/Products/ByPriceCategory/{priceCategory}
         //[HttpGet("categories/{category_id}/ByPriceCategory/{priceCategory}")]
